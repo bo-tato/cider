@@ -25,7 +25,7 @@ You'll also have to configure Piggieback manually if you're planning to use
 +
 [source,clojure]
 ----
-[cider/piggieback "0.5.1"]
+[cider/piggieback "0.5.3"]
 ----
 +
 . Add this to your dev `:repl-options` (not needed for `cider-jack-in-cljs`):
@@ -67,7 +67,8 @@ deps.edn.
 ----
 {:aliases {:fig {:extra-deps
                  {com.bhauman/rebel-readline-cljs {:mvn/version "0.1.4"}
-                  com.bhauman/figwheel-main {:mvn/version "0.2.3"}}}}}
+                  com.bhauman/figwheel-main {:mvn/version "0.2.17"}}}
+           :build {:main-opts ["-m" "figwheel.main" "-b" "dev" "-r"]}}}
 ----
 +
 . Add this option to your project's `.dir-locals.el` before opening the
@@ -77,7 +78,7 @@ use `revert-buffer`.)
 +
 [source,lisp]
 ----
-((clojurescript-mode . ((cider-clojure-cli-aliases . "-A:fig"))))
+((clojurescript-mode . ((cider-clojure-cli-aliases . "-M:fig:build"))))
 ----
 
 TIP: If you didn't setup `.dir-locals.el` you can edit the command-line
@@ -122,7 +123,7 @@ in the root of your Leiningen project definition.
 +
 [source,clojure]
 ----
-[cider/piggieback "0.5.1"] ; not needed for cider-jack-in-cljs
+[cider/piggieback "0.5.3"] ; not needed for cider-jack-in-cljs
 [figwheel-sidecar "0.5.19"] ; use here whatever the current version of figwheel is
 ----
 +

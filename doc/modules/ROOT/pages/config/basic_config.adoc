@@ -27,6 +27,28 @@ buffers. You can override this behavior, however:
 (setq cider-auto-mode nil)
 ----
 
+== Use `enrich-classpath`
+
+`enrich-classpath` is a program/plugin/wrapper that allows CIDER to access to the sources and javadocs of a given project's Java files: your own files, those from your dependencies, and those from the JDK.
+
+With that, CIDER can show better completions, navigation, documentation, and stacktrace integration.
+
+For Lein users, it has the additional benefit of running a single JVM, instead of the two JVMs that Lein programs typically involve.
+
+NOTE: `enrich-classpath` is still in beta and defaults to being disabled.
+
+You can enable it by setting the `cider-enrich-classpath` defcustom to `t`.
+
+With it enabled, `cider-jack-in` will activate enrich-classpath, given the following conditions:
+
+* You are on macOS/Linux
+* You are launching a vanilla JVM repl (and not a cljs repl, or a clj+cljs repl)
+* You are using `cider-jack-in` / `cider-jack-in-clj` (and not `cider-connect`)
+
+...those conditions will be progressively relaxed.
+
+It's worth noting that `cider-jack-in` will fall back to the original command if enrich-classpath failed, for whatever reason.
+
 == Prompt for Symbol Confirmation
 
 NOTE: The default here was changed in CIDER 1.0.
@@ -201,9 +223,10 @@ To prefer local resources to remote resources (tramp) when both are available:
 
 == Translate File Paths
 
-If you wish to translate file paths from your running instance you may use the
-`cider-path-translations` defcustom to do so. For instance, suppose your app is
-running in a docker container with your source directories mounted there. The
+If you are running Clojure within a Docker image, or doing something similar (i.e. you're `cider-connect`ing to a process,
+and there's a directory mapping for your source paths), you typically need to set `cider-path-translations`
+for jump-to-definition to properly work. For instance, suppose your app is
+running in a docker container with your source directories mounted there as volumes. The
 navigation paths you'd get from nREPL will be relative to the source in the
 docker container rather than the correct path on your host machine. You can add
 translation mappings easily by setting the following (typically in `.dir-locals.el`):
@@ -236,6 +259,14 @@ different configurations.
 
 In this example, the path `/src` will be translated to the correct path of your
 Clojure project on the host machine. And `/root/.m2` to the host's `~/.m2` folder.
+
+You need to run `lein deps` (or `clojure -P`, etc) in the host machine in order for
+navigation to fully work, at least once, and then, preferably, every time your Maven dependencies change.
+This allows the `.m2` part of `cider-path-translations` to be actually useful.
+
+If you can't or won't do that, you can use TRAMP capabilities (which CIDER supports) instead of
+setting up `cider-path-translations`. For that, you'd typically need to set up a SSH daemon
+within your Docker image. 
 
 == Filter out namespaces in certain namespace-related commands
 

@@ -311,7 +311,7 @@ the `enrich-classpath` integration like this:
 === Navigation to JDK sources doesn't work
 
 Firstly, make sure that you are using enrich-classpath. `cider-enrich-classpath` should be truthy.
-If you are launching your own repl process, it should have the enrich-classpath Leiningen plugin or `clojure` wrapper.
+If you are launching your own repl process, it should run through enrich-classpath's `lein` wrapper, or `clojure` wrapper.
 
 If you are on Linux and still can't navigate to the source of built-in methods like `.toUpperCase` you
 probably haven't installed the JDK sources. While you're at it - it's good to
@@ -352,3 +352,17 @@ You can disable this Paredit behaviour by adding the following to your `init.el`
 ----
 (define-key paredit-mode-map (kbd "RET") nil)
 ----
+
+=== Interactions fail with `No linked CIDER sessions`
+
+If any interactive feature is being shortcircuited for you with the message `No linked CIDER sessions`,
+that's due to one of the following reasons:
+
+* You're evaluating code in a buffer from a project that hasn't started a repl
+ ** You can fix this by switching instead to a project that has.
+ ** You can also, simply, start a repl in the current project.
+* There's a bug in the CIDER/Sesman integration
+ ** Session linking generally works by determining whether the current buffer is related to the classpath of some REPL.
+ ** You can obtain debug info echoed to the `*messages*` buffer by running `M-x cider-debug-sesman-friendly-session-p` on the problematic buffer.
+  *** By reading it, you might be able to determine why CIDER failed to see the relationship between `(buffer-filename)` and the classpath.
+  *** Feel free to created a detailed GitHub issue including this information.

@@ -20,6 +20,8 @@
 (require 'buttercup)
 (require 'cider-mode)
 
+;; Please, for each `describe', ensure there's an `it' block, so that its execution is visible in CI.
+
 (defmacro cider--test-with-content (content expected &rest body)
   (declare (indent 2)
            (debug t))
@@ -140,5 +142,4 @@
         ("a" "b" "the-ns")
       (cider--read-locals-from-arglist))))
 
-(provide 'cider-locals-tests)
 ;;; cider-locals-tests.el ends here

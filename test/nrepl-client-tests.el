@@ -31,6 +31,8 @@
 (require 'nrepl-client)
 (require 'nrepl-tests-utils "test/utils/nrepl-tests-utils")
 
+;; Please, for each `describe', ensure there's an `it' block, so that its execution is visible in CI.
+
 (describe "nrepl-server-buffer-name"
   :var (nrepl-hide-special-buffers params default-directory-backup
                                    cider-session-name-template)
@@ -110,6 +112,17 @@
                 :to-equal "*buff-name (cljs)*")
         (expect (nrepl-make-buffer-name "*buff-name %r:%S*" params)
                 :to-equal "*buff-name cljs*")))))
+
+(describe "nrepl--port-string-to-number"
+  (it "Converts a string to number when adequate"
+    (expect (nrepl--port-string-to-number "1234\nfoobar")
+            :to-equal 1234)
+    (expect (nrepl--port-string-to-number "")
+            :to-equal nil)
+    (expect (nrepl--port-string-to-number "\n")
+            :to-equal nil)
+    (expect (nrepl--port-string-to-number "adas\n")
+            :to-equal nil)))
 
 (describe "nrepl-parse-port"
   (it "standard"

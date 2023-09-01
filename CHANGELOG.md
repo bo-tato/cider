@@ -2,6 +2,71 @@
 
 ## master (unreleased)
 
+### New features
+
+- [#3352](https://github.com/clojure-emacs/cider/pull/3352) Add CIDER Log Mode, a major mode that allows you to capture, debug, inspect and view log events emitted by Java logging frameworks.
+- `cider-test`: add timing information.
+- `cider-test`: fail-fast by default, as controlled by the new `cider-test-fail-fast` defcustom and `cider-test-toggle-fail-fast` keybinding.
+- Infer indentation specs when possible ([doc](https://docs.cider.mx/cider/indent_spec.html#indentation-inference)).
+- [#3418](https://github.com/clojure-emacs/cider/issues/3418): Introduce `cider-clojure-compilation-error-phases`.
+  - This prevents stacktraces from showing up whenever the [:clojure.error/phase](https://clojure.org/reference/repl_and_main#_at_repl) indicates that it's a compilation error.
+- Add new customization variable `cider-clojurec-eval-destination` to allow specifying which REPL CLJC evals are sent to.
+- [#3354](https://github.com/clojure-emacs/cider/issues/3354): Add new customization variable `cider-reuse-dead-repls` to control how dead REPL buffers are reused on new connections.
+- [#3364](https://github.com/clojure-emacs/cider/pull/3364): Update enrich-classpath, adding Clojure CLI compatibility, and reworking its integration into CIDER.
+  * It will be progressively refined and documented, please consider this alpha software.
+
+### Bugs fixed
+
+- [#3341](https://github.com/clojure-emacs/cider/issues/3341): Escape clojure-cli args on MS-Windows on non powershell invocations.
+- [#3353](https://github.com/clojure-emacs/cider/issues/3353): Fix regression which caused new connections to prompt for reusing dead REPLs.
+- [#3355](https://github.com/clojure-emacs/cider/pull/3355): Fix `cider-mode` disabling itself after a disconnect when `cider-auto-mode` is set to nil.
+- [#3362](https://github.com/clojure-emacs/cider/issues/3362): Fix `sesman-restart` regression issue.
+- [#3236](https://github.com/clojure-emacs/cider/issues/3236): `cider-repl-set-ns` no longer changes the repl session type from `cljs:shadow` to `clj`.
+- [#3383](https://github.com/clojure-emacs/cider/issues/3383): `cider-connect-clj&cljs`: don't render `"ClojureScript REPL type:"` for JVM repls. 
+- [#3331](https://github.com/clojure-emacs/cider/issues/3331): `cider-eval`: never jump to spurious locations, as sometimes conveyed by nREPL.  
+- [#3112](https://github.com/clojure-emacs/cider/issues/3112): Fix the CIDER `xref-find-references` backend to return correct filenames.
+- [#3393](https://github.com/clojure-emacs/cider/issues/3393): recompute namespace info on each shadow-cljs recompilation or evaluation.
+- [#3402](https://github.com/clojure-emacs/cider/issues/3402): fix `cider-format-connection-params` edge case for Emacs 29.
+- [#3393](https://github.com/clojure-emacs/cider/issues/3393): Recompute namespace info on each shadow-cljs recompilation or evaluation.
+- Recompute namespace info on each fighweel-main recompilation.
+- [#3250](https://github.com/clojure-emacs/cider/issues/3250): don't lose the CIDER session over TRAMP files. 
+- [#3413](https://github.com/clojure-emacs/cider/issues/3413): Make jump-to-definition work in projects needing `cider-path-translations` (i.e. Dockerized projects). 
+- [#2436](https://github.com/clojure-emacs/cider/issues/2436): Prevent malformed `cider-repl-history-file`s from failing `cider-jack-in`.
+- Fix the `xref-find-definitions` CIDER backend to return correct filenames.
+- Fix the `cider-xref-fn-deps` buttons to direct to the right file.
+- Fix the `cider-find-keyword` overall reliability and correctness, particularly for ClojureScript.
+- Make TRAMP functionality work when using non-standard ports.
+
+### Changes
+
+- [#3390](https://github.com/clojure-emacs/cider/issues/3390): Enhance `cider-connect` to show all nREPLs available ports, instead of only Leiningen ones.
+- [#3408](https://github.com/clojure-emacs/cider/issues/3408): `cider-connect`: check `.nrepl-port`-like files for liveness, hiding them if they don't reflect an active port.
+- Introduce `cider-stacktrace-navigate-to-other-window` defcustom.
+- Preserve the `:cljs-repl-type` more reliably.
+- Improve the presentation of `xref` data.
+- [#3419](https://github.com/clojure-emacs/cider/issues/3419): Also match friendly sessions based on the buffer's ns form.
+- Always match friendly sessions for `cider-ancillary-buffers` (like `*cider-error*`, `*cider-result*`, etc).
+- `cider-test`: only show diffs for collections.
+- [#3375](https://github.com/clojure-emacs/cider/pull/3375): `cider-test`: don't render a newline between expected and actual, most times.
+- Ensure there's a leading `:` when using `cider-clojure-cli-aliases`.
+- Improve `nrepl-dict` error reporting.
+- Bump the injected `piggieback` to [0.5.3](https://github.com/nrepl/piggieback/blob/0.5.3/CHANGES.md#053-2021-10-26).
+- Bump the `clojure-mode` required version, and use `clojure-find-ns` more safely, which fixes issues such as #[2849](https://github.com/clojure-emacs/cider/issues/2849).
+- Bump the injected `cider-nrepl` to [0.37.0](https://github.com/clojure-emacs/cider-nrepl/blob/v0.37.0/CHANGELOG.md#0370-2023-08-27).
+  - Improves indentation, font-locking and other metadata support for ClojureScript.
+  - Updates [Orchard](https://github.com/clojure-emacs/orchard/blob/v0.14.2/CHANGELOG.md)
+    - introduces support for displaying the docstring and arglists of 'indirect' vars (e.g. `(def foo bar)`) for Clojure/Script.
+    - fixes xref support across deftest vars.
+  - Updates [Compliment](https://github.com/alexander-yakushev/compliment/blob/0.4.1/CHANGELOG.md#041-2023-08-23)
+    - Improves type hint propagation.
+    - Supports better completions for `->`, `->>` and `doto`.
+    - Supports better completions for var-quote (`#'some/var`).
+    - Supports better completions for deftype field names.
+  - Updates [Haystack](https://github.com/clojure-emacs/haystack/blob/0077b5c49f4aef1c7f89d5430d6dda2f9e7d78d4/CHANGELOG.md#020-2023-08-20).
+    - Now, in `*cider-error*`, more internal stackframes will be hidden under the `tooling` category.
+  - Updates [Suitable](https://github.com/clojure-emacs/clj-suitable/blob/v0.5.0/CHANGELOG.md#050-2023-07-28)
+    - avoiding side-effecting `->` evaluation for pure-ClojureScript chains.
+
 ## 1.7.0 (2023-03-23)
 
 ### New features
@@ -19,6 +84,7 @@
 - Bump the injected `cider-nrepl` to 0.30.
 - [#3219](https://github.com/clojure-emacs/cider/issues/3219): Disable by default forcing the display of output when the REPL prompt is at the first line of the of the REPL window. This behavior is desirable, but very slow and rarely needed. It can be re-enabled by setting `cider-repl-display-output-before-window-boundaries` to `t`.
 - [#3335](https://github.com/clojure-emacs/cider/issues/3335): Disable the Paredit binding of RET in cider-repl-mode buffers, which can cause unexpected behaviour by appearing to hang instead of evaluating forms.
+- [#3307](https://github.com/clojure-emacs/cider/issues/3307): Make eldoc highlighting on emacs special forms better match the location of the point when latest `cider-nrepl` is used.
 
 ## 1.6.0 (2022-12-21)
 

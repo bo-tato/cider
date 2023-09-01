@@ -13,7 +13,7 @@ jobs:
     strategy:
       matrix:
         os: [macos-latest, ubuntu-latest, windows-latest]
-        emacs_version: ['26.3', '27.2', '28.2']
+        emacs_version: ['26.3', '27.2', '28.2', '29.1']
 
     steps:
     - name: Set up Emacs
@@ -43,6 +43,13 @@ jobs:
 
         curl.exe -fsSL https://raw.github.com/doublep/eldev/master/webinstall/github-eldev.bat | cmd /Q
 
+    - name: Install deps.clj on MS-Windows
+      if: startsWith (matrix.os, 'windows')
+      run: |
+        iwr -Uri https://raw.githubusercontent.com/borkdude/deps.clj/master/install.ps1 -outfile install_clojure.ps1
+        .\install_clojure.ps1
+        get-command deps.exe | split-path -parent | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+
     - name: Check out the source code
       uses: actions/checkout@v2
 
@@ -71,4 +78,7 @@ jobs:
 
     - name: Test integration
       run: |
-        eldev -p -dtTC test --test-type integration
+        # The tests occasionally fail on macos&win in what is seems to
+        # be GH connectivity runner issues. We attempt to address this
+        # problem by rerunning the tests more than once.
+        eldev -p -dtTC test --test-type integration || eldev -p -dtTC test --test-type integration

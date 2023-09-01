@@ -23,6 +23,19 @@ temporary overlay or in the echo area:
 (setq cider-show-error-buffer nil)
 ----
 
+Starting from CIDER 1.8.0, only runtime exceptions (and not compilation errors)
+will cause a stacktrace buffer to be shown. This better follows Clojure 1.10's
+https://clojure.org/reference/repl_and_main#_at_repl[intended semantics].
+This behavior is controlled by the `cider-clojure-compilation-error-phases` configuration option.
+If you wish for the error phase to be ignored, and to only take `cider-show-error-buffer` into account,
+please customize:
+
+[source,lisp]
+----
+(setq cider-clojure-compilation-error-phases nil)
+----
+
+
 At times, the error being displayed will originate from a bug in CIDER
 itself. These internal errors might frequently occur and interrupt
 your workflow, but you might not want to suppress *all* stacktrace
@@ -57,6 +70,18 @@ To disable auto-selection of the error buffer when it's displayed:
 ----
 (setq cider-auto-select-error-buffer nil)
 ----
+
+By default, when you jump to the source of a given stack frame,
+an Emacs window other than that of `+*cider-error*+` will be chosen.
+If you wish to reuse `+*cider-error*+`'s window instead, please configure:
+
+[source,lisp]
+----
+(setq cider-stacktrace-navigate-to-other-window nil)
+----
+
+TIP: If you have customized this setting, when you have navigated to a given source file,
+you can navigate back to `+*cider-error*+` with kbd:[C-x <left>] (`previous-buffer`) or kbd:[M-,] (`xref-pop-marker-stack`).
 
 == Navigating Stacktraces
 

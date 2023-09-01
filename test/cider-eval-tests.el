@@ -28,6 +28,8 @@
 (require 'buttercup)
 (require 'cider-eval)
 
+;; Please, for each `describe', ensure there's an `it' block, so that its execution is visible in CI.
+
 (describe "cider-provide-file"
   (it "returns an empty string when the file is not found"
     (expect (cider-provide-file "abc.clj") :to-equal ""))
@@ -47,4 +49,11 @@
         (insert "🍻"))
       (expect (cider-provide-file filename) :to-equal "8J+Nuw=="))))
 
-(provide 'cider-eval-tests)
+(describe "cider-extract-error-info"
+  (it "Matches Clojure compilation exceptions"
+    (expect (cider-extract-error-info cider-compilation-regexp "Syntax error compiling clojure.core/let at (src/haystack/analyzer.clj:18:1).\n[1] - failed: even-number-of-forms? at: [:bindings] spec: :clojure.core.specs.alpha/bindings\n")
+            :to-equal '("src/haystack/analyzer.clj" 18 1 cider-error-highlight-face "Syntax error compiling clojure.core/let at (src/haystack/analyzer.clj:18:1).\n[1] - failed: even-number-of-forms? at: [:bindings] spec: :clojure.core.specs.alpha/bindings\n"))
+    (expect (cider-extract-error-info cider-compilation-regexp "Syntax error macroexpanding clojure.core/let at (src/haystack/analyzer.clj:18:1).\n[1] - failed: even-number-of-forms? at: [:bindings] spec: :clojure.core.specs.alpha/bindings\n")
+            :to-equal '("src/haystack/analyzer.clj" 18 1 cider-error-highlight-face "Syntax error macroexpanding clojure.core/let at (src/haystack/analyzer.clj:18:1).\n[1] - failed: even-number-of-forms? at: [:bindings] spec: :clojure.core.specs.alpha/bindings\n"))
+    (expect (cider-extract-error-info cider-compilation-regexp "Syntax error FOOING clojure.core/let at (src/haystack/analyzer.clj:18:1).\n[1] - failed: even-number-of-forms? at: [:bindings] spec: :clojure.core.specs.alpha/bindings\n")
+            :to-equal nil)))

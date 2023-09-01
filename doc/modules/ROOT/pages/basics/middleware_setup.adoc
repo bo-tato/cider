@@ -32,23 +32,14 @@ Use the convenient plugin for defaults, either in your project's
 
 [source,clojure]
 ----
-:plugins [[cider/cider-nrepl "x.y.z"]
-          [mx.cider/enrich-classpath "x.y.z"]]
+:plugins [[cider/cider-nrepl "0.37.0"]]
 ----
-
-https://github.com/clojure-emacs/enrich-classpath[enrich-classpath] is a library (and Leiningen plugin) that, as its main feature, automatically downloads all available `.jars` with Java sources and javadocs for a given project, so that various tools (e.g. CIDER) can access it. Simply put - it allows you to navigate to Java sources and
-javadocs in your Clojure projects.
-
-NOTE: `enrich-classpath` has a bit of a startup cost associated with it, the first time Java sources and javadocs are fetched. It can be turned
-off by setting `cider-enrich-classpath` to `nil`.
 
 A minimal `profiles.clj` for CIDER would be:
 
 [source,clojure]
 ----
-{:repl {:plugins [[cider/cider-nrepl "0.28.5"]
-                  [mx.cider/enrich-classpath "1.9.0"]]}}
-----
+{:repl {:plugins [[cider/cider-nrepl "0.37.0"]]}}
 
 WARNING: Be careful not to place this in the `:user` profile, as this way CIDER's
 middleware will always get loaded, causing `lein` to start slower.  You really
@@ -67,7 +58,7 @@ all of their projects using a `~/.boot/profile.boot` file like so:
 (require 'boot.repl)
 
 (swap! boot.repl/*default-dependencies*
-       concat '[[cider/cider-nrepl "0.25.2"]])
+       concat '[[cider/cider-nrepl "0.37.0"]])
 
 (swap! boot.repl/*default-middleware*
        conj 'cider.nrepl/cider-middleware)
@@ -84,12 +75,12 @@ run `cider-connect` or `cider-connect-cljs`.
 
 [source,clojure]
 ----
-  :cider-clj {:extra-deps {cider/cider-nrepl {:mvn/version "0.22.4"}}
+  :cider-clj {:extra-deps {cider/cider-nrepl {:mvn/version "0.37.0"}}
               :main-opts ["-m" "nrepl.cmdline" "--middleware" "[cider.nrepl/cider-middleware]"]}
 
   :cider-cljs {:extra-deps {org.clojure/clojurescript {:mvn/version "1.10.339"}
-                            cider/cider-nrepl {:mvn/version "0.22.4"}
-                            cider/piggieback {:mvn/version "0.5.1"}}
+                            cider/cider-nrepl {:mvn/version "0.37.0"}
+                            cider/piggieback {:mvn/version "0.5.3"}}
                :main-opts ["-m" "nrepl.cmdline" "--middleware"
                            "[cider.nrepl/cider-middleware,cider.piggieback/wrap-cljs-repl]"]}
 ----

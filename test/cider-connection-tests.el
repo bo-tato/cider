@@ -33,6 +33,8 @@
 (require 'cider-connection)
 (require 'cider-connection-test-utils "test/utils/cider-connection-test-utils")
 
+;; Please, for each `describe', ensure there's an `it' block, so that its execution is visible in CI.
+
 (describe "cider-ensure-connected"
   :var (sesman-sessions-hashmap sesman-links-alist ses-name ses-name2)
 
@@ -58,6 +60,12 @@
   (before-each
     (setq sesman-sessions-hashmap (make-hash-table :test #'equal)
           sesman-links-alist nil
+          cider-ancillary-buffers (seq-filter (lambda (s)
+                                                ;; sometimes "*temp*" buffers can sneak into cider-ancillary-buffers.
+                                                ;; Those are the artifact of some other test, and can break these tests
+                                                ;; by affecting the logic in cider--sesman-friendly-session-p.
+                                                (string-prefix-p "*cider" s))
+                                              cider-ancillary-buffers)
           ses-name "a-session"
           ses-name2 "b-session"))
 
@@ -434,7 +442,7 @@
          (sesman-unregister 'CIDER session))))))
 
 (describe "cider-format-connection-params"
-  (describe "correctly abbreviates short directory names"
+  (it "correctly abbreviates short directory names"
     (expect (cider-format-connection-params "%J" '(:project-dir "~"))
             :to-equal "~")
     (expect (cider-format-connection-params "%j" '(:project-dir "~"))
@@ -470,7 +478,7 @@
     (expect 'y-or-n-p :to-have-been-called-times 3)))
 
 (describe "cider-compatible-middleware-version-p"
-  (describe "correctly check compatible required and middleware versions"
+  (it "correctly checks compatible required and middleware versions"
     (expect (cider--compatible-middleware-version-p "0.24.0" "0.24.1")
             :to-be t)
     (expect (cider--compatible-middleware-version-p "0.24.1" "0.23.2")
@@ -485,3 +493,35 @@
             :to-be t)
     (expect (cider--compatible-middleware-version-p "1.25.3" "1.25.2-alpha2")
             :to-be t)))
+
+(defun cider-connection-tests-dummy-function (a b c d)
+  "A B C D."
+  ;; See https://github.com/clojure-emacs/cider/issues/3402
+  (error "I should never be invoked!"))
+
+(describe "cider-format-connection-params"
+  (it "Generates a pretty string. `:repl-type' can be symbol." ;; https://github.com/clojure-emacs/cider/issues/3402
+    (expect (cider-format-connection-params nrepl-repl-buffer-name-template nil)
+            :to-equal "*cider-repl ~/project:localhost:(unknown)*")
+    (expect (cider-format-connection-params nrepl-repl-buffer-name-template '(:host "localhost"
+                                                                                    :port 12345
+                                                                                    :project-dir "/Users/me/myproject"
+                                                                                    :repl-type clj
+                                                                                    :cljs-repl-type shadow))
+            :to-equal "*cider-repl me/myproject:localhost:12345(clj)*")
+
+    (expect (cider-format-connection-params nrepl-repl-buffer-name-template '(:host "localhost"
+                                                                                    :port 12345
+                                                                                    :project-dir "/Users/me/myproject"
+                                                                                    :repl-type cljs
+                                                                                    :cljs-repl-type shadow))
+            :to-equal "*cider-repl me/myproject:localhost:12345(cljs:shadow)*"))
+
+  (it "Never invokes symbols as functions (Emacs 29 feature)"
+    (expect (functionp 'cider-connection-tests-dummy-function)
+            :to-equal t)
+    (expect (cider-format-connection-params nrepl-repl-buffer-name-template '(:host "localhost"
+                                                                                    :port 12345
+                                                                                    :project-dir "/Users/me/myproject"
+                                                                                    :repl-type cider-connection-tests-dummy-function))
+            :to-equal "*cider-repl me/myproject:localhost:12345(cider-connection-tests-dummy-function)*")))
