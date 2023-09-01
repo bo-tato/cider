@@ -759,9 +759,8 @@ The boolean value of FORCE will be sent in the reply."
   (let ((here (point)))
     (nrepl-dbind-response cider--debug-mode-response (line column)
       (if (and line column (buffer-file-name))
-          (progn ;; Get to the proper line & column in the file
-            (forward-line (1- (- line (line-number-at-pos))))
-            (move-to-column column))
+          ;; Get to the proper line & column in the file
+          (forward-line (- line (line-number-at-pos)))
         (beginning-of-defun))
       ;; Is HERE inside the sexp being debugged?
       (when (or (< here (point))
